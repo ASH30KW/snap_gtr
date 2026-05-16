@@ -5,14 +5,16 @@ from PIL import Image
 from utils.typing import *
 
 
-def save_images_to_gif(image_list, output_file, fps=15, verbose=False):
+def save_images_to_gif(image_list, output_file, fps=15, verbose=False, transparent=False):
     """
     Save a list of images to a GIF file.
 
     Args:
         image_list (list of numpy arrays): A list of image frames (as numpy arrays).
         output_file (str): The path to the output GIF file.
-        duration (float): The duration (in seconds) for each frame in the GIF.
+        fps (int): Frames per second for the GIF.
+        verbose (bool): Print status message.
+        transparent (bool): If True, preserve alpha channel for transparent background.
     """
     if verbose:
         print(f"Save images to {output_file}")
@@ -20,9 +22,15 @@ def save_images_to_gif(image_list, output_file, fps=15, verbose=False):
     if not output_file.endswith('.gif'):
         output_file += '.gif'
     # Save the images to a GIF
-    with imageio.get_writer(output_file, mode='I', fps=fps, loop=0) as writer:
-        for image in image_list:
-            writer.append_data(image)
+    if transparent:
+        # For transparent GIFs, we need to use disposal=2 to clear previous frames
+        with imageio.get_writer(output_file, mode='I', fps=fps, loop=0, disposal=2) as writer:
+            for image in image_list:
+                writer.append_data(image)
+    else:
+        with imageio.get_writer(output_file, mode='I', fps=fps, loop=0) as writer:
+            for image in image_list:
+                writer.append_data(image)
 
 
 def slice_gif(output_file, gif_file, x_offset=0, x_size=None, y_offset=0, y_size=None):
