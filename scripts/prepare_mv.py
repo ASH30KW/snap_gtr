@@ -316,10 +316,6 @@ def main(
 
         width, height = 512, 512
 
-    # Create subdirectory for separated views
-    separated_dir = Path(out_dir).parent / "separated_views"
-    separated_dir.mkdir(exist_ok=True, parents=True)
-
     if padding > 0:
         logger.info(f"Applying {padding}px padding to each view")
 
@@ -328,10 +324,6 @@ def main(
     for i in range(len(img_list)):
         img = img_list[i]
         pil_img = np01_to_pil(img)
-
-        # Save original separated view (before background removal)
-        original_view_file = f"{separated_dir}/view_{i:03d}_original.png"
-        pil_img.save(original_view_file)
 
         # Apply padding if specified (extends boundary with background color)
         if padding > 0:
@@ -358,16 +350,9 @@ def main(
         out_file = f"{out_dir}/rgb_{i:03d}.png"
         view.save(out_file)
 
-        # Also save processed view in separated directory
-        separated_view_file = f"{separated_dir}/view_{i:03d}_processed.png"
-        view.save(separated_view_file)
-
     prepare_cameras(out_dir, actual_fov, (width, height), theta_list, phi_list, radius_list)
 
     logger.info(f"✅ Saved {len(img_list)} processed views to: {out_dir}")
-    logger.info(f"✅ Saved {len(img_list)} separated views to: {separated_dir}")
-    logger.info(f"   - Original views: view_XXX_original.png")
-    logger.info(f"   - Processed views: view_XXX_processed.png")
 
 
 if __name__ == "__main__":
